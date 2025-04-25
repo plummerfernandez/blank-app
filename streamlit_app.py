@@ -5,9 +5,14 @@ import requests
 from io import BytesIO
 from PIL import Image, ImageDraw
 import time
-import face_recognition
+#import face_recognition
+import mediapipe as mp
 import random
 import os
+
+# Initialize MediaPipe Face Detection
+mp_face_detection = mp.solutions.face_detection
+mp_drawing = mp.solutions.drawing_utils
 
 # --- Your custom function for image enhancement ---
 def enhance_image(image, contrast_factor=1.1, black_point=50):
@@ -68,28 +73,41 @@ if st.button("🔄 Get Next Image"):
                 enhanced_image = enhance_image(original_image)
                 bw_image = enhanced_image.convert("L")
 
-                # Use face_recognition to find faces
-                image_np = face_recognition.load_image_file(BytesIO(response.content))
-                face_locations = face_recognition.face_locations(image_np)
+                # Convert PIL image to RGB and process with MediaPipe
+                image_rgb = enhanced_image.convert("RGB")
+                image_np = np.array(image_rgb)
 
-                if face_locations:
-                    draw_image = bw_image.convert("RGB")
-                    draw = ImageDraw.Draw(draw_image)
-                    colors = ["red", "green", "blue", "yellow", "orange"]
+                with mp_face_detection.FaceDetection(model_selection=1, min_detection_confidence=0.5) as face_detection:
+                    results = face_detection.process(image=Image.open(BytesIO(response.content)))
 
-                    for (top, right, bottom, left) in face_locations:
-                        cx = (left + right) // 2
-                        cy = (top + bottom) // 2
-                        radius = int(max((right - left), (bottom - top)) * 0.55)
-                        color = random.choice(colors)
-                        draw.ellipse(
-                            [(cx - radius, cy - radius), (cx + radius, cy + radius)],
-                            fill=color, outline=color, width=2
-                        )
+                    if results.detections:
+                        draw_image = bw_image.convert("RGB")
+                        draw = ImageDraw.Draw(draw_image)
+                        colors = ["red", "green", "blue", "yellow", "orange"]
 
-                    st.image(draw_image, caption=f"Faces hidden in image {photo_id}", use_container_width=True)
-                    found_image = True
-                    break  # Done with one image
+                        for detection in results.detections:
+                            # Get bounding box coordinates
+                            bboxC = detection.location_data.relative_bounding_box
+                            h, w, _ = image_np.shape
+                            x_min = int(bboxC.xmin * w)
+                            y_min = int(bboxC.ymin * h)
+                            bbox_width = int(bboxC.width * w)
+                            bbox_height = int(bboxC.height * h)
+
+                            # Calculate center and radius
+                            cx = x_min + bbox_width // 2
+                            cy = y_min + bbox_height // 2
+                            radius = int(max(bbox_width, bbox_height) * 0.55)
+                            color = random.choice(colors)
+
+                            draw.ellipse(
+                                [(cx - radius, cy - radius), (cx + radius, cy + radius)],
+                                fill=color, outline=color, width=2
+                            )
+
+                        st.image(draw_image, caption=f"Faces hidden in image {photo_id}", use_container_width=True)
+                        found_image = True
+                        break  # Done with one image
 
         except Exception as e:
             st.warning(f"Error: {e}")
