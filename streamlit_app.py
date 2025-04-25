@@ -10,7 +10,7 @@ import random
 import os
 
 # --- Your custom function for image enhancement ---
-def enhance_image(image, contrast_factor=1.1, black_point=50):
+def enhance_image(image, contrast_factor=1.5, black_point=20):
     from PIL import ImageEnhance
     image = image.convert("RGB")
     enhancer = ImageEnhance.Contrast(image)
