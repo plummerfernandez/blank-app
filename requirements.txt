@@ -1,6 +1,7 @@
-streamlit
-flickrapi
-face_recognition
-pillow
-numpy
-requests
+dlib==19.24.0
+streamlit==1.32.0
+face_recognition==1.3.0
+flickrapi==2.4.0
+Pillow==10.2.0
+numpy==1.26.4
+requests==2.31.0
