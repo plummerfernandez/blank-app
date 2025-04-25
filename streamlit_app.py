@@ -1,18 +1,13 @@
-
 import streamlit as st
 import flickrapi
 import requests
 from io import BytesIO
 from PIL import Image, ImageDraw
 import time
-#import face_recognition
-import mediapipe as mp
+import cv2  # OpenCV for face detection
+import numpy as np
 import random
 import os
-
-# Initialize MediaPipe Face Detection
-mp_face_detection = mp.solutions.face_detection
-mp_drawing = mp.solutions.drawing_utils
 
 # --- Your custom function for image enhancement ---
 def enhance_image(image, contrast_factor=1.1, black_point=50):
@@ -31,6 +26,10 @@ api_secret = st.secrets["flickr"]["api_secret"]
 flickr = flickrapi.FlickrAPI(api_key, api_secret, format='parsed-json')
 photos_folder = "photos"
 os.makedirs(photos_folder, exist_ok=True)
+
+# --- Load OpenCV Haar Cascade for face detection ---
+cascade_path = cv2.data.haarcascades + "haarcascade_frontalface_default.xml"
+face_cascade = cv2.CascadeClassifier(cascade_path)
 
 # --- Session State: track where we are in time ---
 if "timenow" not in st.session_state:
@@ -73,41 +72,37 @@ if st.button("🔄 Get Next Image"):
                 enhanced_image = enhance_image(original_image)
                 bw_image = enhanced_image.convert("L")
 
-                # Convert PIL image to RGB and process with MediaPipe
-                image_rgb = enhanced_image.convert("RGB")
-                image_np = np.array(image_rgb)
+                # Convert to OpenCV format (numpy array)
+                image_np = np.array(enhanced_image)
 
-                with mp_face_detection.FaceDetection(model_selection=1, min_detection_confidence=0.5) as face_detection:
-                    results = face_detection.process(image=Image.open(BytesIO(response.content)))
+                # Convert RGB to grayscale for face detection
+                gray_image = cv2.cvtColor(image_np, cv2.COLOR_RGB2GRAY)
 
-                    if results.detections:
-                        draw_image = bw_image.convert("RGB")
-                        draw = ImageDraw.Draw(draw_image)
-                        colors = ["red", "green", "blue", "yellow", "orange"]
+                # Detect faces using OpenCV
+                faces = face_cascade.detectMultiScale(
+                    gray_image, scaleFactor=1.1, minNeighbors=5, minSize=(30, 30)
+                )
 
-                        for detection in results.detections:
-                            # Get bounding box coordinates
-                            bboxC = detection.location_data.relative_bounding_box
-                            h, w, _ = image_np.shape
-                            x_min = int(bboxC.xmin * w)
-                            y_min = int(bboxC.ymin * h)
-                            bbox_width = int(bboxC.width * w)
-                            bbox_height = int(bboxC.height * h)
+                if len(faces) > 0:
+                    draw_image = bw_image.convert("RGB")
+                    draw = ImageDraw.Draw(draw_image)
+                    colors = ["red", "green", "blue", "yellow", "orange"]
 
-                            # Calculate center and radius
-                            cx = x_min + bbox_width // 2
-                            cy = y_min + bbox_height // 2
-                            radius = int(max(bbox_width, bbox_height) * 0.55)
-                            color = random.choice(colors)
+                    for (x, y, w, h) in faces:
+                        # Calculate center and radius
+                        cx = x + w // 2
+                        cy = y + h // 2
+                        radius = int(max(w, h) * 0.55)
+                        color = random.choice(colors)
 
-                            draw.ellipse(
-                                [(cx - radius, cy - radius), (cx + radius, cy + radius)],
-                                fill=color, outline=color, width=2
-                            )
+                        draw.ellipse(
+                            [(cx - radius, cy - radius), (cx + radius, cy + radius)],
+                            fill=color, outline=color, width=2
+                        )
 
-                        st.image(draw_image, caption=f"Faces hidden in image {photo_id}", use_container_width=True)
-                        found_image = True
-                        break  # Done with one image
+                    st.image(draw_image, caption=f"Faces hidden in image {photo_id}", use_container_width=True)
+                    found_image = True
+                    break  # Done with one image
 
         except Exception as e:
             st.warning(f"Error: {e}")
