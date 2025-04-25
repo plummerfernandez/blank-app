@@ -35,7 +35,7 @@ if "timenow" not in st.session_state:
 if "processed_ids" not in st.session_state:
     st.session_state.processed_ids = set()
 
-st.title("🎭 Flickr Face Concealer")
+st.title("🔴 Baldessari Neverending")
 
 st.write("Click the button below to search and process a new image taken ~20 years ago.")
 
@@ -87,7 +87,7 @@ if st.button("🔄 Get Next Image"):
                             fill=color, outline=color, width=2
                         )
 
-                    st.image(draw_image, caption=f"Faces hidden in image {photo_id}", use_column_width=True)
+                    st.image(draw_image, caption=f"Faces hidden in image {photo_id}", use_container_width=True)
                     found_image = True
                     break  # Done with one image
 
