@@ -1,1 +1,6 @@
 streamlit
+flickrapi
+face_recognition
+pillow
+numpy
+requests
