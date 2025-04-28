@@ -103,24 +103,51 @@ if st.button("🔄 Make another"):
                 )
 
                 if len(faces) > 0:
-                    draw_image = bw_image.convert("RGB")
-                    draw = ImageDraw.Draw(draw_image)
+                    # Create a high-resolution version of the image for anti-aliasing
+                    scale_factor = 4  # Adjust as needed for better quality
+                    high_res_size = (bw_image.width * scale_factor, bw_image.height * scale_factor)
+                    high_res_image = bw_image.resize(high_res_size).convert("RGB")
+                    draw = ImageDraw.Draw(high_res_image)
                     colors = ["red", "green", "blue", "yellow", "orange"]
 
                     for (x, y, w, h) in faces:
-                        # Calculate center and radius
-                        cx = x + w // 2
-                        cy = y + h // 2
-                        radius = int(max(w, h) * 0.55)
+                        # Calculate center and radius (scaled)
+                        cx = (x + w // 2) * scale_factor
+                        cy = (y + h // 2) * scale_factor
+                        radius = int(max(w, h) * 0.55 * scale_factor)
                         color = random.choice(colors)
 
+                        # Draw a high-resolution ellipse
                         draw.ellipse(
                             [(cx - radius, cy - radius), (cx + radius, cy + radius)],
-                            fill=color, outline=color, width=2
+                            fill=color,
+                            outline=color,
+                            width=2 * scale_factor  # Scale the width for higher resolution
                         )
+
+                    # Downscale the high-resolution image back to the original size
+                    draw_image = high_res_image.resize(bw_image.size, resample=Image.ANTIALIAS)
 
                     st.image(draw_image, caption=f"Made with Flickr image {photo_id}", use_container_width=True)
                     found_image = True
+                    # draw_image = bw_image.convert("RGB")
+                    # draw = ImageDraw.Draw(draw_image)
+                    # colors = ["red", "green", "blue", "yellow", "orange"]
+
+                    # for (x, y, w, h) in faces:
+                    #     # Calculate center and radius
+                    #     cx = x + w // 2
+                    #     cy = y + h // 2
+                    #     radius = int(max(w, h) * 0.55)
+                    #     color = random.choice(colors)
+
+                    #     draw.ellipse(
+                    #         [(cx - radius, cy - radius), (cx + radius, cy + radius)],
+                    #         fill=color, outline=color, width=2
+                    #     )
+
+                    # st.image(draw_image, caption=f"Made with Flickr image {photo_id}", use_container_width=True)
+                    # found_image = True
                     break  # Done with one image
 
         except Exception as e:
