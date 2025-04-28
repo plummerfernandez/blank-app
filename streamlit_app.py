@@ -126,7 +126,7 @@ if st.button("🔄 Make another"):
                         )
 
                     # Downscale the high-resolution image back to the original size
-                    draw_image = high_res_image.resize(bw_image.size, resample=Image.ANTIALIAS)
+                    draw_image = high_res_image.resize(bw_image.size, resample=Image.Resampling.LANCZOS)
 
                     st.image(draw_image, caption=f"Made with Flickr image {photo_id}", use_container_width=True)
                     found_image = True
