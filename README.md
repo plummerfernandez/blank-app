@@ -1,6 +1,8 @@
-# 🎈 Blank app template
+# Baldessari Neverending
 
-A simple Streamlit app template for you to modify!
+A little internet art project that generates endless John Baldessari spot paintings by sourcing images from Flickr and using Computer Vision to spot faces. 
+
+I am using Streamlit to host the python script so that it runs in-browser.
 
 [![Open in Streamlit](https://static.streamlit.io/badges/streamlit_badge_black_white.svg)](https://blank-app-template.streamlit.app/)
 
