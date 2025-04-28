@@ -23,11 +23,17 @@ def enhance_image(image, contrast_factor=1.5, black_point=20):
     image = image.convert("RGB")
     enhancer = ImageEnhance.Contrast(image)
     image = enhancer.enhance(contrast_factor)
-    image = image.point(lambda p: max(p - black_point, 0))
+    #image = image.point(lambda p: max(p - black_point, 0))
     # Adjust black point
     # image_np = np.array(image)
     # image_np[image_np < black_point] = black_point
     # image = Image.fromarray(image_np, mode=image.mode)
+
+    # Adjust black point using NumPy
+    image_np = np.array(image)
+    image_np[image_np < black_point] = black_point
+    image = Image.fromarray(image_np, mode=image.mode)
+    
     return image
 
 # --- Load API keys from secrets.toml ---
