@@ -9,15 +9,14 @@ import numpy as np
 import random
 import os
 
-# --- custom CSS to make header and footer invisible
 st.markdown(
     """
     <style>
-    footer {visibility:hidden;}
+    footer {display: none;}
     </style>
-    """
+    """,
+    unsafe_allow_html=True
 )
-
 # --- Your custom function for image enhancement ---
 def enhance_image(image, contrast_factor=1.5, black_point=20):
     from PIL import ImageEnhance
