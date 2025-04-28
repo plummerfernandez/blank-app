@@ -13,6 +13,7 @@ st.markdown(
     """
     <style>
     footer {display: none;}
+    header {display: none;}
     </style>
     """,
     unsafe_allow_html=True
@@ -33,7 +34,7 @@ def enhance_image(image, contrast_factor=1.5, black_point=20):
     image_np = np.array(image)
     image_np[image_np < black_point] = black_point
     image = Image.fromarray(image_np, mode=image.mode)
-    
+
     return image
 
 # --- Load API keys from secrets.toml ---
@@ -59,9 +60,9 @@ if "processed_ids" not in st.session_state:
 
 st.title("🔴 Baldessari Neverending")
 
-st.write("Click the button below to search and process a new image taken ~20 years ago.")
+st.write("Generate a Baldessari Spot Painting")
 
-if st.button("🔄 Get Next Image"):
+if st.button("🔄 Make another"):
     found_image = False
     tries = 0
 
@@ -118,7 +119,7 @@ if st.button("🔄 Get Next Image"):
                             fill=color, outline=color, width=2
                         )
 
-                    st.image(draw_image, caption=f"Faces hidden in image {photo_id}", use_container_width=True)
+                    st.image(draw_image, caption=f"Made with Flickr image {photo_id}", use_container_width=True)
                     found_image = True
                     break  # Done with one image
 
