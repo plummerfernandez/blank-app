@@ -8,12 +8,33 @@ import cv2  # OpenCV for face detection
 import numpy as np
 import random
 import os
+import base64
 
+
+# Load font file and encode it
+def load_font(font_path):
+    with open(font_path, "rb") as f:
+        data = f.read()
+    return base64.b64encode(data).decode()
+
+# Path to your font file
+font_base64 = load_font("fonts/Baldessari-Regular.ttf")
+
+# Inject CSS to load the font and hide header and footer.
 st.markdown(
-    """
+    f"""
     <style>
-    footer {display: none;}
-    header {display: none;}
+    @font-face {{
+        font-family: 'Baldessari-Regular';
+        src: url(data:font/ttf;base64,{font_base64}) format('truetype');
+    }}
+
+    html, body, [class*="css"] {{
+        font-family: 'Baldessari-Regular';
+    }}
+
+    footer {{display: none;}}
+    header {{display: none;}}
     </style>
     """,
     unsafe_allow_html=True
