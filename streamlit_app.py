@@ -29,8 +29,8 @@ st.markdown(
         src: url(data:font/ttf;base64,{font_base64}) format('truetype');
     }}
 
-    html, body, [class*="css"] {{
-        font-family: 'Baldessari-Regular';
+    html, body, [class*="css"], h1, h2, h3, h4, h5, h6, .stText, .stMarkdown {{
+        font-family: 'Baldessari-Regular' !important;
     }}
 
     footer {{display: none;}}
@@ -79,7 +79,7 @@ if "timenow" not in st.session_state:
 if "processed_ids" not in st.session_state:
     st.session_state.processed_ids = set()
 
-st.title("🔴 Baldessari Neverending")
+st.title("Baldessari Neverending")
 
 st.write("Generate a Baldessari Spot Painting")
 
