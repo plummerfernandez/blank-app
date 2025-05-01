@@ -30,7 +30,7 @@ st.markdown(
     }}
 
     /* Apply font to common Streamlit elements */
-    html, body, [class*="css"], h1, h2, h3, h4, h5, h6,
+    html, body, [class*="css"], h1, h2, h3, h4, h5, h6, p,
     .stText, .stMarkdown, .stButton > button, .stLabel, .stRadio, .stSelectbox, .stTextInput, .stSlider {{
         font-family: 'Baldessari-Regular' !important;
     }}
