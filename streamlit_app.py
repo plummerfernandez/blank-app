@@ -29,7 +29,9 @@ st.markdown(
         src: url(data:font/ttf;base64,{font_base64}) format('truetype');
     }}
 
-    html, body, [class*="css"], h1, h2, h3, h4, h5, h6, .stText, .stMarkdown {{
+    /* Apply font to common Streamlit elements */
+    html, body, [class*="css"], h1, h2, h3, h4, h5, h6,
+    .stText, .stMarkdown, .stButton > button, .stLabel, .stRadio, .stSelectbox, .stTextInput, .stSlider {{
         font-family: 'Baldessari-Regular' !important;
     }}
 
