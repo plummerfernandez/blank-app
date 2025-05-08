@@ -10,6 +10,7 @@ import random
 import os
 import base64
 from ultralytics import YOLO
+from datetime import datetime, timedelta
 
 
 # Load YOLOv8 pretrained model
@@ -83,11 +84,18 @@ if "timenow" not in st.session_state:
 if "processed_ids" not in st.session_state:
     st.session_state.processed_ids = set()
 
-st.title("baldessari neverending")
+# --- Session State: track last trigger time ---
+if "last_trigger_time" not in st.session_state:
+    st.session_state.last_trigger_time = datetime.now()
 
-st.write("GENERATE A BALDESSARI SPOT PAINTING")
+# --- Function to Check Idle Mode ---
+def should_run_idle():
+    idle_interval = timedelta(seconds=30)  # 30-second interval
+    return datetime.now() - st.session_state.last_trigger_time > idle_interval
 
-if st.button("🔄 make another"):
+# --- Main Logic ---
+def process_image():
+    st.session_state.last_trigger_time = datetime.now()  # Update the last trigger time
     found_image = False
     tries = 0
 
@@ -154,9 +162,7 @@ if st.button("🔄 make another"):
                         refined_faces.append((x + fx, face_region_y + fy, fw, fh))
                     else:
                         # Fall back to YOLO's face region estimate
-                        #refined_faces.append((x, face_region_y, w, face_region_h))
-                        #found_image = False #escaping this try 
-                        break  # Done with one image
+                        refined_faces.append((x, face_region_y, w, face_region_h))
 
                 if len(refined_faces) > 0:
                     # Create a high-resolution version of the image for anti-aliasing
@@ -164,15 +170,13 @@ if st.button("🔄 make another"):
                     high_res_size = (bw_image.width * scale_factor, bw_image.height * scale_factor)
                     high_res_image = bw_image.resize(high_res_size).convert("RGB")
                     draw = ImageDraw.Draw(high_res_image)
-                    #colors = ["red", "green", "blue", "yellow", "orange"]
-                    colors = ["#d93832","#993333", "#4d8f56", "#3b86ac", "#e4d050", "#e0923b"]  # Hex values for red, dark red, green, blue, yellow, orange, black
-
+                    colors = ["#d93832", "#993333", "#4d8f56", "#3b86ac", "#e4d050", "#e0923b"]  # Updated hex colors
 
                     for (x, y, w, h) in refined_faces:
                         # Calculate center and radius (scaled)
                         cx = (x + w // 2) * scale_factor
                         cy = (y + h // 2) * scale_factor
-                        radius = int(max(w, h) * 0.45 * scale_factor)  # Reduce radius multiplier
+                        radius = int(max(w, h) * 0.45 * scale_factor)  # Adjust radius multiplier
                         color = random.choice(colors)
 
                         # Draw a high-resolution ellipse
@@ -198,3 +202,9 @@ if st.button("🔄 make another"):
 
     if not found_image:
         st.info("No suitable image found this time. Try again.")
+
+
+# --- Trigger Logic ---
+manual_trigger = st.button("🔄 make another")  # Manual trigger
+if manual_trigger or should_run_idle():
+    process_image()
