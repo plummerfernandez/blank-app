@@ -165,7 +165,7 @@ if st.button("🔄 make another"):
                     high_res_image = bw_image.resize(high_res_size).convert("RGB")
                     draw = ImageDraw.Draw(high_res_image)
                     #colors = ["red", "green", "blue", "yellow", "orange"]
-                    colors = ["#993333", "#4d8f56", "#3b86ac", "#e4d050", "#e0923b"]  # Hex values for red, green, blue, yellow, orange
+                    colors = ["#d93832","#993333", "#4d8f56", "#3b86ac", "#e4d050", "#e0923b", "#000000"]  # Hex values for red, dark red, green, blue, yellow, orange, black
 
 
                     for (x, y, w, h) in refined_faces:
