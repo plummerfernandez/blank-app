@@ -149,7 +149,7 @@ if st.button("🔄 make another"):
                         # Calculate center and radius (scaled)
                         cx = (x + w // 2) * scale_factor
                         cy = (y + h // 2) * scale_factor
-                        radius = int(max(w, h) * 0.35 * scale_factor)  # Reduce radius multiplier
+                        radius = int(max(w, h) * 0.15 * scale_factor)  # Reduce radius multiplier
                         color = random.choice(colors)
 
                         # Draw a high-resolution ellipse
