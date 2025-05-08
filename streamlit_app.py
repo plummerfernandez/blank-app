@@ -9,7 +9,10 @@ import numpy as np
 import random
 import os
 import base64
+from ultralytics import YOLO
 
+# Load YOLOv8 pretrained model
+model = YOLO("yolov8n.pt")  # Use the nano model for lightweight performance
 
 # Load font file and encode it
 def load_font(font_path):
@@ -42,17 +45,13 @@ st.markdown(
     """,
     unsafe_allow_html=True
 )
+
 # --- Your custom function for image enhancement ---
 def enhance_image(image, contrast_factor=1.5, black_point=20):
     from PIL import ImageEnhance
     image = image.convert("RGB")
     enhancer = ImageEnhance.Contrast(image)
     image = enhancer.enhance(contrast_factor)
-    #image = image.point(lambda p: max(p - black_point, 0))
-    # Adjust black point
-    # image_np = np.array(image)
-    # image_np[image_np < black_point] = black_point
-    # image = Image.fromarray(image_np, mode=image.mode)
 
     # Adjust black point using NumPy
     image_np = np.array(image)
@@ -70,9 +69,9 @@ flickr = flickrapi.FlickrAPI(api_key, api_secret, format='parsed-json')
 photos_folder = "photos"
 os.makedirs(photos_folder, exist_ok=True)
 
-# --- Load OpenCV Haar Cascade for face detection ---
-cascade_path = cv2.data.haarcascades + "haarcascade_frontalface_default.xml"
-face_cascade = cv2.CascadeClassifier(cascade_path)
+# --- Load OpenCV Haar Cascade for face detection (Commented Out for Reference) ---
+# cascade_path = cv2.data.haarcascades + "haarcascade_frontalface_default.xml"
+# face_cascade = cv2.CascadeClassifier(cascade_path)
 
 # --- Session State: track where we are in time ---
 if "timenow" not in st.session_state:
@@ -115,16 +114,19 @@ if st.button("🔄 make another"):
                 enhanced_image = enhance_image(original_image)
                 bw_image = enhanced_image.convert("L")
 
-                # Convert to OpenCV format (numpy array)
+                # Convert to NumPy array for YOLO
                 image_np = np.array(enhanced_image)
 
-                # Convert RGB to grayscale for face detection
-                gray_image = cv2.cvtColor(image_np, cv2.COLOR_RGB2GRAY)
+                # --- YOLO Face Detection ---
+                results = model(image_np)
+                detections = results[0].boxes.data.cpu().numpy()  # YOLO detections
+                faces = [(int(x1), int(y1), int(x2 - x1), int(y2 - y1)) for x1, y1, x2, y2, conf, cls in detections if cls == 0]  # Filter for 'person' class
 
-                # Detect faces using OpenCV
-                faces = face_cascade.detectMultiScale(
-                    gray_image, scaleFactor=1.1, minNeighbors=5, minSize=(30, 30)
-                )
+                # --- Haar Cascade Detection (Commented Out) ---
+                # gray_image = cv2.cvtColor(image_np, cv2.COLOR_RGB2GRAY)
+                # faces = face_cascade.detectMultiScale(
+                #     gray_image, scaleFactor=1.1, minNeighbors=5, minSize=(30, 30)
+                # )
 
                 if len(faces) > 0:
                     # Create a high-resolution version of the image for anti-aliasing
@@ -154,24 +156,6 @@ if st.button("🔄 make another"):
 
                     st.image(draw_image, caption=f"Made with Flickr image {photo_id}", use_container_width=True)
                     found_image = True
-                    # draw_image = bw_image.convert("RGB")
-                    # draw = ImageDraw.Draw(draw_image)
-                    # colors = ["red", "green", "blue", "yellow", "orange"]
-
-                    # for (x, y, w, h) in faces:
-                    #     # Calculate center and radius
-                    #     cx = x + w // 2
-                    #     cy = y + h // 2
-                    #     radius = int(max(w, h) * 0.55)
-                    #     color = random.choice(colors)
-
-                    #     draw.ellipse(
-                    #         [(cx - radius, cy - radius), (cx + radius, cy + radius)],
-                    #         fill=color, outline=color, width=2
-                    #     )
-
-                    # st.image(draw_image, caption=f"Made with Flickr image {photo_id}", use_container_width=True)
-                    # found_image = True
                     break  # Done with one image
 
         except Exception as e:
