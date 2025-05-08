@@ -10,11 +10,7 @@ import random
 import os
 import base64
 from ultralytics import YOLO
-from pyvirtualdisplay import Display
 
-# Start a virtual display
-display = Display(visible=0, size=(1024, 768))
-display.start()
 
 # Load YOLOv8 pretrained model
 model = YOLO("yolov8n.pt")  # Use the nano model for lightweight performance
