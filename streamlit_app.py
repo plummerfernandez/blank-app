@@ -208,13 +208,33 @@ def process_image():
 #st.title("baldessari neverending")
 st.write("BALDESSARI NEVERENDING")
 
+# Initialize idle counter in session state
+if "idle_counter" not in st.session_state:
+    st.session_state.idle_counter = 0
+
 # --- Trigger Logic ---
 manual_trigger = st.button("🔄 make another")  # Manual trigger
-if manual_trigger or should_run_idle():
-    process_image()
+if manual_trigger:
+    st.session_state.last_trigger_time = datetime.now()
+    st.session_state.idle_counter = 0  # Reset idle counter
+    process_image()  # Run image processing
 
-# --- Force App Refresh ---
-# Refresh the app every second to check for idle mode
-if not manual_trigger:
-    time.sleep(1)
-    st._rerun()  # This forces the Streamlit app to rerun
+# --- Idle Mode Logic ---
+# Check if idle mode should trigger
+if should_run_idle():
+    st.session_state.last_trigger_time = datetime.now()
+    st.session_state.idle_counter = 0  # Reset idle counter
+    process_image()  # Run image processing
+
+# --- Increment Idle Counter ---
+# Increment the idle counter to simulate refresh
+st.session_state.idle_counter += 1
+
+# Display idle timer for debugging (optional)
+st.write(f"Idle Counter: {st.session_state.idle_counter}")
+st.write(f"Last Trigger Time: {st.session_state.last_trigger_time}")
+
+# Simulate periodic refresh by re-rendering the app
+if st.session_state.idle_counter > 10:  # Refresh every ~10 seconds
+    st.session_state.idle_counter = 0  # Reset counter
+    st.experimental_rerun()
