@@ -216,4 +216,4 @@ if manual_trigger or should_run_idle():
 # --- Force App Refresh ---
 # Refresh the app every second to check for idle mode
 time.sleep(1)
-st.experimental_rerun()
+st.experimental_set_query_params(dummy=str(time.time()))
