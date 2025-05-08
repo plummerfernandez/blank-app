@@ -208,33 +208,33 @@ def process_image():
 #st.title("baldessari neverending")
 st.write("BALDESSARI NEVERENDING")
 
-# Initialize idle counter in session state
-if "idle_counter" not in st.session_state:
-    st.session_state.idle_counter = 0
+# Initialize session state variables
+if "last_trigger_time" not in st.session_state:
+    st.session_state.last_trigger_time = datetime.now()
+if "idle_mode_triggered" not in st.session_state:
+    st.session_state.idle_mode_triggered = False
+
+# --- Function to Check Idle Mode ---
+def should_run_idle():
+    idle_interval = timedelta(seconds=10)  # Change this to 10 seconds
+    return datetime.now() - st.session_state.last_trigger_time > idle_interval
 
 # --- Trigger Logic ---
 manual_trigger = st.button("🔄 make another")  # Manual trigger
 if manual_trigger:
-    st.session_state.last_trigger_time = datetime.now()
-    st.session_state.idle_counter = 0  # Reset idle counter
+    st.session_state.last_trigger_time = datetime.now()  # Update the last trigger time
+    st.session_state.idle_mode_triggered = False  # Reset idle mode flag
     process_image()  # Run image processing
 
-# --- Idle Mode Logic ---
-# Check if idle mode should trigger
+# --- Idle Mode ---
 if should_run_idle():
-    st.session_state.last_trigger_time = datetime.now()
-    st.session_state.idle_counter = 0  # Reset idle counter
+    st.session_state.last_trigger_time = datetime.now()  # Update the last trigger time
+    st.session_state.idle_mode_triggered = True  # Set idle mode flag
     process_image()  # Run image processing
 
-# --- Increment Idle Counter ---
-# Increment the idle counter to simulate refresh
-st.session_state.idle_counter += 1
-
-# Display idle timer for debugging (optional)
-st.write(f"Idle Counter: {st.session_state.idle_counter}")
-st.write(f"Last Trigger Time: {st.session_state.last_trigger_time}")
-
-# Simulate periodic refresh by re-rendering the app
-if st.session_state.idle_counter > 10:  # Refresh every ~10 seconds
-    st.session_state.idle_counter = 0  # Reset counter
-    st.experimental_rerun()
+# --- Periodic Refresh ---
+if not manual_trigger and not st.session_state.idle_mode_triggered:
+    import time
+    st.write("Refreshing in 1 second...")  # Optional visual feedback
+    time.sleep(1)  # Wait for 1 second before re-rendering
+    # Re-render the app by allowing Streamlit's natural flow to refresh
