@@ -215,5 +215,6 @@ if manual_trigger or should_run_idle():
 
 # --- Force App Refresh ---
 # Refresh the app every second to check for idle mode
-time.sleep(1)
-st.experimental_update_query_params(dummy=str(time.time()))
+if not manual_trigger:
+    time.sleep(1)
+    st._rerun()  # This forces the Streamlit app to rerun
