@@ -33,6 +33,7 @@ st.markdown(
     html, body, [class*="css"], h1, h2, h3, h4, h5, h6, p,
     .stText, .stMarkdown, .stButton > button, .stLabel, .stRadio, .stSelectbox, .stTextInput, .stSlider {{
         font-family: 'Baldessari-Regular' !important;
+        text-align: center; /* Center-align text */
     }}
 
     footer {{display: none;}}
@@ -81,11 +82,11 @@ if "timenow" not in st.session_state:
 if "processed_ids" not in st.session_state:
     st.session_state.processed_ids = set()
 
-st.title("Baldessari Neverending")
+st.title("baldessari neverending")
 
-st.write("Generate a Baldessari Spot Painting")
+st.write("GENERATE A BALDESSARI SPOT PAINTING")
 
-if st.button("🔄 Make another"):
+if st.button("🔄 make another"):
     found_image = False
     tries = 0
 
