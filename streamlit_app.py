@@ -212,3 +212,8 @@ st.write("BALDESSARI NEVERENDING")
 manual_trigger = st.button("🔄 make another")  # Manual trigger
 if manual_trigger or should_run_idle():
     process_image()
+
+# --- Force App Refresh ---
+# Refresh the app every second to check for idle mode
+time.sleep(1)
+st.experimental_rerun()
