@@ -71,9 +71,9 @@ flickr = flickrapi.FlickrAPI(api_key, api_secret, format='parsed-json')
 photos_folder = "photos"
 os.makedirs(photos_folder, exist_ok=True)
 
-# --- Load OpenCV Haar Cascade for face detection (Commented Out for Reference) ---
-# cascade_path = cv2.data.haarcascades + "haarcascade_frontalface_default.xml"
-# face_cascade = cv2.CascadeClassifier(cascade_path)
+# --- Load OpenCV Haar Cascade for face detection ---
+cascade_path = cv2.data.haarcascades + "haarcascade_frontalface_default.xml"
+face_cascade = cv2.CascadeClassifier(cascade_path)
 
 # --- Session State: track where we are in time ---
 if "timenow" not in st.session_state:
@@ -131,11 +131,30 @@ if st.button("🔄 make another"):
                     if conf > CONFIDENCE_THRESHOLD and cls == 0  # Class 0 is 'person'
                 ]
 
-                # Fine-tune detection: Focus on face region (upper part of bounding box)
-                FACE_PROPORTION = 0.3  # Only the top 30% of the bounding box (face region)
+                # Refine face detection using Haar cascades
+                FACE_PROPORTION = 0.3  # Top 30% of the bounding box for the face
                 refined_faces = []
                 for (x, y, w, h) in faces:
-                    refined_faces.append((x, y, w, int(h * FACE_PROPORTION)))
+                    # Extract the upper portion of the bounding box (face region)
+                    face_region_y = y
+                    face_region_h = int(h * FACE_PROPORTION)
+                    face_region = image_np[face_region_y:face_region_y + face_region_h, x:x + w]
+
+                    # Convert the face region to grayscale for Haar cascades
+                    gray_face_region = cv2.cvtColor(face_region, cv2.COLOR_RGB2GRAY)
+
+                    # Detect faces with Haar cascades
+                    haar_faces = face_cascade.detectMultiScale(
+                        gray_face_region, scaleFactor=1.1, minNeighbors=5, minSize=(30, 30)
+                    )
+
+                    if len(haar_faces) > 0:
+                        # Use the first detected Haar face to refine the position
+                        (fx, fy, fw, fh) = haar_faces[0]
+                        refined_faces.append((x + fx, face_region_y + fy, fw, fh))
+                    else:
+                        # Fall back to YOLO's face region estimate
+                        refined_faces.append((x, face_region_y, w, face_region_h))
 
                 if len(refined_faces) > 0:
                     # Create a high-resolution version of the image for anti-aliasing
