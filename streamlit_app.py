@@ -155,6 +155,7 @@ if st.button("🔄 make another"):
                     else:
                         # Fall back to YOLO's face region estimate
                         refined_faces.append((x, face_region_y, w, face_region_h))
+                        found_image = False #escaping this try 
 
                 if len(refined_faces) > 0:
                     # Create a high-resolution version of the image for anti-aliasing
@@ -168,7 +169,7 @@ if st.button("🔄 make another"):
                         # Calculate center and radius (scaled)
                         cx = (x + w // 2) * scale_factor
                         cy = (y + h // 2) * scale_factor
-                        radius = int(max(w, h) * 0.45 * scale_factor)  # Reduce radius multiplier
+                        radius = int(max(w, h) * 0.25 * scale_factor)  # Reduce radius multiplier
                         color = random.choice(colors)
 
                         # Draw a high-resolution ellipse
