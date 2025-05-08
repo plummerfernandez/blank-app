@@ -90,7 +90,7 @@ if "last_trigger_time" not in st.session_state:
 
 # --- Function to Check Idle Mode ---
 def should_run_idle():
-    idle_interval = timedelta(seconds=30)  # 30-second interval
+    idle_interval = timedelta(seconds=10)  # 30-second interval
     return datetime.now() - st.session_state.last_trigger_time > idle_interval
 
 # --- Main Logic ---
@@ -162,7 +162,8 @@ def process_image():
                         refined_faces.append((x + fx, face_region_y + fy, fw, fh))
                     else:
                         # Fall back to YOLO's face region estimate
-                        refined_faces.append((x, face_region_y, w, face_region_h))
+                        #refined_faces.append((x, face_region_y, w, face_region_h))
+                        break
 
                 if len(refined_faces) > 0:
                     # Create a high-resolution version of the image for anti-aliasing
@@ -203,6 +204,9 @@ def process_image():
     if not found_image:
         st.info("No suitable image found this time. Try again.")
 
+# --- App Header ---
+#st.title("baldessari neverending")
+st.write("BALDESSARI NEVERENDING")
 
 # --- Trigger Logic ---
 manual_trigger = st.button("🔄 make another")  # Manual trigger
