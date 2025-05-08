@@ -164,13 +164,15 @@ if st.button("🔄 make another"):
                     high_res_size = (bw_image.width * scale_factor, bw_image.height * scale_factor)
                     high_res_image = bw_image.resize(high_res_size).convert("RGB")
                     draw = ImageDraw.Draw(high_res_image)
-                    colors = ["red", "green", "blue", "yellow", "orange"]
+                    #colors = ["red", "green", "blue", "yellow", "orange"]
+                    colors = ["#993333", "#4d8f56", "#3b86ac", "#e4d050", "#e0923b"]  # Hex values for red, green, blue, yellow, orange
+
 
                     for (x, y, w, h) in refined_faces:
                         # Calculate center and radius (scaled)
                         cx = (x + w // 2) * scale_factor
                         cy = (y + h // 2) * scale_factor
-                        radius = int(max(w, h) * 0.35 * scale_factor)  # Reduce radius multiplier
+                        radius = int(max(w, h) * 0.40 * scale_factor)  # Reduce radius multiplier
                         color = random.choice(colors)
 
                         # Draw a high-resolution ellipse
