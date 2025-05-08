@@ -122,15 +122,22 @@ if st.button("🔄 make another"):
                 # --- YOLO Face Detection ---
                 results = model(image_np)
                 detections = results[0].boxes.data.cpu().numpy()  # YOLO detections
-                faces = [(int(x1), int(y1), int(x2 - x1), int(y2 - y1)) for x1, y1, x2, y2, conf, cls in detections if cls == 0]  # Filter for 'person' class
 
-                # --- Haar Cascade Detection (Commented Out) ---
-                # gray_image = cv2.cvtColor(image_np, cv2.COLOR_RGB2GRAY)
-                # faces = face_cascade.detectMultiScale(
-                #     gray_image, scaleFactor=1.1, minNeighbors=5, minSize=(30, 30)
-                # )
+                # Filter detections by confidence threshold
+                CONFIDENCE_THRESHOLD = 0.5
+                faces = [
+                    (int(x1), int(y1), int(x2 - x1), int(y2 - y1)) 
+                    for x1, y1, x2, y2, conf, cls in detections 
+                    if conf > CONFIDENCE_THRESHOLD and cls == 0  # Class 0 is 'person'
+                ]
 
-                if len(faces) > 0:
+                # Fine-tune detection: Focus on face region (upper part of bounding box)
+                FACE_PROPORTION = 0.3  # Only the top 30% of the bounding box (face region)
+                refined_faces = []
+                for (x, y, w, h) in faces:
+                    refined_faces.append((x, y, w, int(h * FACE_PROPORTION)))
+
+                if len(refined_faces) > 0:
                     # Create a high-resolution version of the image for anti-aliasing
                     scale_factor = 4  # Adjust as needed for better quality
                     high_res_size = (bw_image.width * scale_factor, bw_image.height * scale_factor)
@@ -138,11 +145,11 @@ if st.button("🔄 make another"):
                     draw = ImageDraw.Draw(high_res_image)
                     colors = ["red", "green", "blue", "yellow", "orange"]
 
-                    for (x, y, w, h) in faces:
+                    for (x, y, w, h) in refined_faces:
                         # Calculate center and radius (scaled)
                         cx = (x + w // 2) * scale_factor
                         cy = (y + h // 2) * scale_factor
-                        radius = int(max(w, h) * 0.55 * scale_factor)
+                        radius = int(max(w, h) * 0.35 * scale_factor)  # Reduce radius multiplier
                         color = random.choice(colors)
 
                         # Draw a high-resolution ellipse
