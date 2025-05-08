@@ -132,7 +132,7 @@ if st.button("🔄 make another"):
                 ]
 
                 # Refine face detection using Haar cascades
-                FACE_PROPORTION = 0.3  # Top 30% of the bounding box for the face
+                FACE_PROPORTION = 0.4  # Top 40% of the bounding box for the face
                 refined_faces = []
                 for (x, y, w, h) in faces:
                     # Extract the upper portion of the bounding box (face region)
@@ -154,8 +154,9 @@ if st.button("🔄 make another"):
                         refined_faces.append((x + fx, face_region_y + fy, fw, fh))
                     else:
                         # Fall back to YOLO's face region estimate
-                        refined_faces.append((x, face_region_y, w, face_region_h))
-                        found_image = False #escaping this try 
+                        #refined_faces.append((x, face_region_y, w, face_region_h))
+                        #found_image = False #escaping this try 
+                        break  # Done with one image
 
                 if len(refined_faces) > 0:
                     # Create a high-resolution version of the image for anti-aliasing
