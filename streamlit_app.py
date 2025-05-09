@@ -47,6 +47,11 @@ st.markdown(
         margin-bottom: 20px; /* Add space below the button */
     }}
 
+    /* Override the padding (gap) for the container */
+    .st-emotion-cache-vlxhtx {{
+        gap: 0px !important; /* Remove the gap */
+    }}
+
     footer {{display: none;}}
     header {{display: none;}}
     </style>
