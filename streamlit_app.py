@@ -90,7 +90,7 @@ if "last_trigger_time" not in st.session_state:
 
 # --- Function to Check Idle Mode ---
 def should_run_idle():
-    idle_interval = timedelta(seconds=20)  # 30-second interval
+    idle_interval = timedelta(seconds=40)  # 40-second interval
     return datetime.now() - st.session_state.last_trigger_time > idle_interval
 
 # --- Main Logic ---
