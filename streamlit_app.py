@@ -235,4 +235,4 @@ if should_run_idle():
 
 # --- Periodic Refresh ---
 #time.sleep(10)  # Wait for 1 second before rerunning the script
-st.rerun()  # Immediately rerun the script
+#st.rerun()  # Immediately rerun the script
