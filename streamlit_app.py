@@ -93,6 +93,12 @@ def should_run_idle():
     idle_interval = timedelta(seconds=40)  # 40-second interval
     return datetime.now() - st.session_state.last_trigger_time > idle_interval
 
+# --- Randomize the time_cursor between 18 and 20 years ago ---
+def randomize_time_cursor():
+    eighteen_years_ago = st.session_state.timenow - (18 * 365 * 24 * 60 * 60)
+    twenty_years_ago = st.session_state.timenow - (20 * 365 * 24 * 60 * 60)
+    return random.randint(twenty_years_ago, eighteen_years_ago)
+
 # --- Main Logic ---
 def process_image():
     st.session_state.last_trigger_time = datetime.now()  # Update the last trigger time
@@ -101,7 +107,11 @@ def process_image():
 
     while not found_image and tries < 10:
         tries += 1
-        slightly_earlier = st.session_state.time_cursor - 120
+        #slightly_earlier = st.session_state.time_cursor - 120
+
+        # Randomize the time window
+        st.session_state.time_cursor = randomize_time_cursor()
+        slightly_earlier = st.session_state.time_cursor - 120  # 2-minute window
 
         try:
             photos = flickr.photos.search(
