@@ -135,7 +135,8 @@ def remove_numbers_from_title(title):
     :param title: The title string to process.
     :return: The title with numbers removed.
     """
-    return re.sub(r'\d+', '', title).strip()
+    return re.sub(r'[\d_]+', '', title).strip()
+
 
 def display_image_with_custom_height(image, max_height="90vh"):
     """
