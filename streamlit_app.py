@@ -84,6 +84,10 @@ if "timenow" not in st.session_state:
 if "processed_ids" not in st.session_state:
     st.session_state.processed_ids = set()
 
+# --- Session State Initialization ---
+if "is_searching" not in st.session_state:
+    st.session_state.is_searching = False  # Flag to track if searching is in progress
+
 # --- Session State: track last trigger time ---
 if "last_trigger_time" not in st.session_state:
     st.session_state.last_trigger_time = datetime.now()
@@ -106,6 +110,8 @@ def randomize_time_cursor():
 # --- Main Logic ---
 def process_image():
     st.session_state.last_trigger_time = datetime.now()  # Update the last trigger time
+    st.session_state.is_searching = True  # Indicate that searching is in progress
+
     found_image = False
     tries = 0
 
@@ -215,6 +221,8 @@ def process_image():
 
         # Advance the time cursor for next search
         st.session_state.time_cursor += 240
+        st.session_state.is_searching = False  # Reset the flag after searching is complete
+
 
     if not found_image:
         st.info("No suitable image found this time. Try again.")
@@ -224,10 +232,20 @@ def process_image():
 st.write("BALDESSARI NEVERENDING")
 
 # --- Trigger Logic ---
-manual_trigger = st.button("🔄 make another")  # Manual trigger
-if manual_trigger:
-    st.session_state.last_trigger_time = datetime.now()  # Update the last trigger time
-    process_image()
+# manual_trigger = st.button("🔄 make another")  # Manual trigger
+# if manual_trigger:
+#     st.session_state.last_trigger_time = datetime.now()  # Update the last trigger time
+#     process_image()
+
+# --- Dynamic Button ---
+if st.session_state.is_searching:
+    st.button("🔄 Searching...", disabled=True)  # Show disabled button with "searching..." text
+else:
+    manual_trigger = st.button("🔄 make another")  # Normal button
+    if manual_trigger:
+        st.session_state.last_trigger_time = datetime.now()  # Update the last trigger time
+        process_image()
+
 
 # --- Idle Mode ---
 # if should_run_idle():
