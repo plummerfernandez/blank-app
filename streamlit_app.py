@@ -280,7 +280,21 @@ def process_image():
                                         
 
                     # st.image(draw_image, caption=f"Made with Flickr image {photo_id}", use_container_width=True)
-                    st.image(draw_image, use_container_width=False)
+                    #st.image(draw_image, use_container_width=False)
+
+
+                    # Save the image to a temporary file
+                    draw_image.save("temp_image.png")  # Save the image temporarily
+
+                    # Display the image with a custom container for proper centering
+                    st.markdown(
+                        """
+                        <div class="image-container">
+                            <img src="temp_image.png" alt="Image" />
+                        </div>
+                        """,
+                        unsafe_allow_html=True
+                    )
 
                     # Example usage
                     # display_image_with_custom_height(
