@@ -113,6 +113,43 @@ def extract_random_word(title):
         return random.choice(words).capitalize()  # Randomly pick a word and capitalize it
     return "WRONG"  # Fallback if no words are found
 
+def display_image_with_custom_height(image, max_height="90vh"):
+    """
+    Display the image with a custom height using CSS.
+    The `max_height` parameter ensures the image does not exceed the screen height.
+
+    :param image: The image to display (PIL object or URL).
+    :param caption: The caption to display below the image.
+    :param max_height: The maximum height of the image (default: "90vh", 90% of viewport height).
+    """
+    # Save the image to a temporary file
+    image.save("temp_image.png")  # Save the image temporarily
+
+    # Inject custom CSS to control the image height
+    st.markdown(
+        f"""
+        <style>
+            .custom-image {{
+                max-height: {max_height};
+                width: auto;
+                display: block;
+                margin: 0 auto;
+            }}
+        </style>
+        """,
+        unsafe_allow_html=True,
+    )
+
+    # Display the image with the custom class
+    st.markdown(
+        f'<img src="temp_image.png" alt="Image" class="custom-image" />',
+        unsafe_allow_html=True,
+    )
+
+    # Display the caption below the image
+    # st.caption(caption)
+
+
 # --- Main Logic ---
 def process_image():
     st.session_state.last_trigger_time = datetime.now()  # Update the last trigger time
@@ -226,7 +263,16 @@ def process_image():
                                         
 
                     # st.image(draw_image, caption=f"Made with Flickr image {photo_id}", use_container_width=True)
-                    st.image(draw_image, use_container_width=True)
+                    # st.image(draw_image, use_container_width=True)
+
+                    # Example usage
+                    display_image_with_custom_height(
+                        image=draw_image,
+                        max_height="90vh",  # Fit 90% of the viewport height
+                    )
+
+
+
                     st.write(f'"{random_word}"')
                     found_image = True
                     break  # Done with one image
