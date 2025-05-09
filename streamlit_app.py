@@ -230,7 +230,7 @@ if manual_trigger:
     process_image()
 
 # --- Idle Mode ---
-if should_run_idle():
-    st.write("idle")  # Debugging (remove after testing)
-    process_image()
-    st.rerun()  # Refresh the app after processing the image in idle mode
+# if should_run_idle():
+#     st.write("idle")  # Debugging (remove after testing)
+#     process_image()
+#     st.rerun()  # Refresh the app after processing the image in idle mode
