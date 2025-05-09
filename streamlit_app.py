@@ -103,6 +103,16 @@ def randomize_time_cursor():
     twenty_years_ago = st.session_state.timenow - (20 * 365 * 24 * 60 * 60)
     return random.randint(twenty_years_ago, eighteen_years_ago)
 
+def extract_random_word(title):
+    """
+    Extract a random word from the title.
+    If the title is empty or no words are found, return 'Untitled'.
+    """
+    words = title.split()  # Split the title into words
+    if words:
+        return random.choice(words).capitalize()  # Randomly pick a word and capitalize it
+    return "WRONG"  # Fallback if no words are found
+
 # --- Main Logic ---
 def process_image():
     st.session_state.last_trigger_time = datetime.now()  # Update the last trigger time
@@ -208,11 +218,16 @@ def process_image():
 
                     # Downscale the high-resolution image back to the original size
                     draw_image = high_res_image.resize(bw_image.size, resample=Image.Resampling.LANCZOS)
-                    
+
+
+
+                    # Extract a random word from the title
+                    random_word = extract_random_word(photo_title)
+                                        
 
                     # st.image(draw_image, caption=f"Made with Flickr image {photo_id}", use_container_width=True)
-                    st.image(draw_image, caption=f"{photo_title}", use_container_width=True)
-                    st.write(photo_title)
+                    st.image(draw_image, use_container_width=True)
+                    st.write(f'"{photo_title}"')
                     found_image = True
                     break  # Done with one image
 
