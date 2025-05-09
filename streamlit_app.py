@@ -49,10 +49,23 @@ st.markdown(
     unsafe_allow_html=True
 )
 
-# Add this to display the stored image (near the app layout)
+# --- Session State Initialization ---
+if "last_image" not in st.session_state:
+    st.session_state.last_image = None
+
+if "timenow" not in st.session_state:
+    st.session_state.timenow = int(time.time())
+    st.session_state.time_cursor = st.session_state.timenow - (20 * 365 * 24 * 60 * 60)
+
+if "processed_ids" not in st.session_state:
+    st.session_state.processed_ids = set()
+
+if "last_trigger_time" not in st.session_state:
+    st.session_state.last_trigger_time = datetime.now()
+
+# --- Display the Last Image ---
 if st.session_state.last_image is not None:
     st.image(st.session_state.last_image, caption="Last Generated Image", use_container_width=True)
-
 
 # --- Your custom function for image enhancement ---
 def enhance_image(image, contrast_factor=1.3, black_point=30):
@@ -67,35 +80,6 @@ def enhance_image(image, contrast_factor=1.3, black_point=30):
     image = Image.fromarray(image_np, mode=image.mode)
 
     return image
-
-# --- Load API keys from secrets.toml ---
-api_key = st.secrets["flickr"]["api_key"]
-api_secret = st.secrets["flickr"]["api_secret"]
-
-# --- Setup ---
-flickr = flickrapi.FlickrAPI(api_key, api_secret, format='parsed-json')
-photos_folder = "photos"
-os.makedirs(photos_folder, exist_ok=True)
-
-# --- Load OpenCV Haar Cascade for face detection ---
-cascade_path = cv2.data.haarcascades + "haarcascade_frontalface_default.xml"
-face_cascade = cv2.CascadeClassifier(cascade_path)
-
-# --- Session State: track where we are in time ---
-if "timenow" not in st.session_state:
-    st.session_state.timenow = int(time.time())
-    st.session_state.time_cursor = st.session_state.timenow - (20 * 365 * 24 * 60 * 60)
-
-if "processed_ids" not in st.session_state:
-    st.session_state.processed_ids = set()
-
-# --- Session State: track last trigger time ---
-if "last_trigger_time" not in st.session_state:
-    st.session_state.last_trigger_time = datetime.now()
-
-# Initialize session state for last image
-if "last_image" not in st.session_state:
-    st.session_state.last_image = None
 
 # --- Function to Check Idle Mode ---
 def should_run_idle():
@@ -116,7 +100,6 @@ def process_image():
 
     while not found_image and tries < 10:
         tries += 1
-        #slightly_earlier = st.session_state.time_cursor - 120
 
         # Randomize the time window
         st.session_state.time_cursor = randomize_time_cursor()
@@ -158,45 +141,19 @@ def process_image():
                     if conf > CONFIDENCE_THRESHOLD and cls == 0  # Class 0 is 'person'
                 ]
 
-                # Refine face detection using Haar cascades
-                FACE_PROPORTION = 0.4  # Top 40% of the bounding box for the face
-                refined_faces = []
-                for (x, y, w, h) in faces:
-                    # Extract the upper portion of the bounding box (face region)
-                    face_region_y = y
-                    face_region_h = int(h * FACE_PROPORTION)
-                    face_region = image_np[face_region_y:face_region_y + face_region_h, x:x + w]
-
-                    # Convert the face region to grayscale for Haar cascades
-                    gray_face_region = cv2.cvtColor(face_region, cv2.COLOR_RGB2GRAY)
-
-                    # Detect faces with Haar cascades
-                    haar_faces = face_cascade.detectMultiScale(
-                        gray_face_region, scaleFactor=1.1, minNeighbors=5, minSize=(30, 30)
-                    )
-
-                    if len(haar_faces) > 0:
-                        # Use the first detected Haar face to refine the position
-                        (fx, fy, fw, fh) = haar_faces[0]
-                        refined_faces.append((x + fx, face_region_y + fy, fw, fh))
-                    else:
-                        # Fall back to YOLO's face region estimate
-                        #refined_faces.append((x, face_region_y, w, face_region_h))
-                        break
-
-                if len(refined_faces) > 0:
+                if len(faces) > 0:
                     # Create a high-resolution version of the image for anti-aliasing
                     scale_factor = 4  # Adjust as needed for better quality
                     high_res_size = (bw_image.width * scale_factor, bw_image.height * scale_factor)
                     high_res_image = bw_image.resize(high_res_size).convert("RGB")
                     draw = ImageDraw.Draw(high_res_image)
-                    colors = ["#d93832", "#993333", "#4d8f56", "#3b86ac", "#e4d050", "#e0923b"]  # Updated hex colors
+                    colors = ["#d93832", "#993333", "#4d8f56", "#3b86ac", "#e4d050", "#e0923b"]
 
-                    for (x, y, w, h) in refined_faces:
+                    for (x, y, w, h) in faces:
                         # Calculate center and radius (scaled)
                         cx = (x + w // 2) * scale_factor
                         cy = (y + h // 2) * scale_factor
-                        radius = int(max(w, h) * 0.45 * scale_factor)  # Adjust radius multiplier
+                        radius = int(max(w, h) * 0.45 * scale_factor)
                         color = random.choice(colors)
 
                         # Draw a high-resolution ellipse
@@ -204,18 +161,17 @@ def process_image():
                             [(cx - radius, cy - radius), (cx + radius, cy + radius)],
                             fill=color,
                             outline=color,
-                            width=2 * scale_factor  # Scale the width for higher resolution
+                            width=2 * scale_factor
                         )
 
                     # Downscale the high-resolution image back to the original size
                     draw_image = high_res_image.resize(bw_image.size, resample=Image.Resampling.LANCZOS)
 
-                    #store image
-                    st.session_state.last_image = draw_image  # Save the image persistently
-
+                    # Store the image
+                    st.session_state.last_image = draw_image
                     st.image(draw_image, caption=f"Made with Flickr image {photo_id}", use_container_width=True)
                     found_image = True
-                    break  # Done with one image
+                    break
 
         except Exception as e:
             st.warning(f"Error: {e}")
@@ -228,13 +184,11 @@ def process_image():
 
 
 # --- App Header ---
-#st.title("baldessari neverending") #commented out for clarity
 st.write("BALDESSARI NEVERENDING")
 
 # --- Trigger Logic ---
-manual_trigger = st.button("🔄 make another")  # Manual trigger
+manual_trigger = st.button("🔄 make another")
 if manual_trigger:
-    st.session_state.last_trigger_time = datetime.now()  # Update the last trigger time
     process_image()
 
 # --- Idle Mode ---
@@ -242,5 +196,4 @@ if should_run_idle():
     process_image()
 
 # --- Periodic Refresh ---
-#time.sleep(10)  # Wait for 1 second before rerunning the script
-st.rerun()  # Immediately rerun the script
+st.rerun()
