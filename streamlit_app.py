@@ -42,6 +42,14 @@ st.markdown(
         text-align: center; /* Center-align text */
     }}
 
+    /* Center and style the image */
+    .image-container {{
+        display: flex;
+        justify-content: center; /* Center horizontally */
+        align-items: center;    /* Center vertically (if necessary) */
+    }}
+
+
     /* Apply a rule to all images */
     img {{
         max-height: 80vh;  /* Fit image to 90% of viewport height */
