@@ -231,8 +231,6 @@ if manual_trigger:
 
 # --- Idle Mode ---
 if should_run_idle():
+    st.write("Idle mode triggered!")  # Debugging (remove after testing)
     process_image()
-
-# --- Periodic Refresh ---
-#time.sleep(10)  # Wait for 1 second before rerunning the script
-#st.rerun()  # Immediately rerun the script
+    st.rerun()  # Refresh the app after processing the image in idle mode
