@@ -44,7 +44,7 @@ st.markdown(
 
     /* Apply a rule to all images */
     img {{
-        max-height: 90vh;  /* Fit image to 90% of viewport height */
+        max-height: 80vh;  /* Fit image to 90% of viewport height */
         width: auto;       /* Maintain aspect ratio */
         display: block;    /* Center horizontally */
         margin: 0 auto;    /* Center the image */
