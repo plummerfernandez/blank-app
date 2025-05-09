@@ -134,6 +134,10 @@ def process_image():
                 response = requests.get(url, stream=True)
                 response.raise_for_status()
 
+                # Fetch photo title using flickr.photos.getInfo
+                photo_info = flickr.photos.getInfo(photo_id=photo_id)
+                photo_title = photo_info['photo']['title']['_content'] or "wrong"
+
                 original_image = Image.open(BytesIO(response.content))
                 enhanced_image = enhance_image(original_image)
                 bw_image = enhanced_image.convert("L")
@@ -207,6 +211,7 @@ def process_image():
                     
 
                     st.image(draw_image, caption=f"Made with Flickr image {photo_id}", use_container_width=True)
+                    st.write({photo_title})
                     found_image = True
                     break  # Done with one image
 
