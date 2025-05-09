@@ -94,7 +94,7 @@ if "last_image" not in st.session_state:
 
 # --- Function to Check Idle Mode ---
 def should_run_idle():
-    idle_interval = timedelta(seconds=10)  # 40-second interval
+    idle_interval = timedelta(seconds=40)  # 40-second interval
     return datetime.now() - st.session_state.last_trigger_time > idle_interval
 
 # --- Randomize the time_cursor between 18 and 20 years ago ---
