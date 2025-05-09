@@ -210,5 +210,17 @@ st.write("BALDESSARI NEVERENDING")
 
 # --- Trigger Logic ---
 manual_trigger = st.button("🔄 make another")  # Manual trigger
-if manual_trigger or should_run_idle():
+if manual_trigger:
+    st.session_state.last_trigger_time = datetime.now()  # Update the last trigger time
     process_image()
+
+# --- Idle Mode ---
+if should_run_idle():
+    process_image()
+
+# --- Periodic Refresh ---
+import time
+
+# Periodic refresh to check for idle condition
+time.sleep(1)  # Wait for 1 second before re-rendering
+st.experimental_rerun()  # Force the app to refresh
