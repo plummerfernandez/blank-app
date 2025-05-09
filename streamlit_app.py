@@ -42,6 +42,11 @@ st.markdown(
         text-align: center; /* Center-align text */
     }}
 
+    /* Add space between the image and the button */
+    .stButton {{
+        margin-bottom: 20px; /* Add space below the button */
+    }}
+
     footer {{display: none;}}
     header {{display: none;}}
     </style>
