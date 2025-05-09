@@ -44,6 +44,7 @@ st.markdown(
 
     /* Add space between the image and the button */
     .stButton {{
+        margin-top: 20px; /* Add space below the button */
         margin-bottom: 20px; /* Add space below the button */
     }}
 
