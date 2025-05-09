@@ -121,7 +121,7 @@ def extract_random_word(title):
     """
     words = title.split()  # Split the title into words
     if words:
-        return random.choice(words).capitalize()  # Randomly pick a word and capitalize it
+        return random.choice(words).upper()  # Randomly pick a word and capitalize it
     return "WRONG"  # Fallback if no words are found
 
 def display_image_with_custom_height(image, max_height="90vh"):
@@ -298,8 +298,8 @@ def process_image():
         st.info("No suitable image found this time. Try again.")
 
 # --- App Header ---
-#st.title("baldessari neverending")
-st.write("BALDESSARI NEVERENDING")
+st.write("baldessari neverending")
+#st.write("BALDESSARI NEVERENDING")
 
 # --- Trigger Logic ---
 manual_trigger = st.button("🔄 make another")  # Manual trigger
