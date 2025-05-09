@@ -210,8 +210,9 @@ def process_image():
                     draw_image = high_res_image.resize(bw_image.size, resample=Image.Resampling.LANCZOS)
                     
 
-                    st.image(draw_image, caption=f"Made with Flickr image {photo_id}", use_container_width=True)
-                    st.write({photo_title})
+                    # st.image(draw_image, caption=f"Made with Flickr image {photo_id}", use_container_width=True)
+                    st.image(draw_image, caption=f"{photo_title}", use_container_width=True)
+                    st.write(photo_title)
                     found_image = True
                     break  # Done with one image
 
