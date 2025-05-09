@@ -16,6 +16,12 @@ from datetime import datetime, timedelta
 # Load YOLOv8 pretrained model
 model = YOLO("yolov8n.pt")  # Use the nano model for lightweight performance
 
+# --- Load API keys from secrets.toml ---
+api_key = st.secrets["flickr"]["api_key"]
+api_secret = st.secrets["flickr"]["api_secret"]
+
+# --- Setup ---
+flickr = flickrapi.FlickrAPI(api_key, api_secret, format='parsed-json')
 
 # Load font file and encode it
 def load_font(font_path):
