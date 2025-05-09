@@ -90,7 +90,7 @@ if "last_trigger_time" not in st.session_state:
 
 # --- Function to Check Idle Mode ---
 def should_run_idle():
-    idle_interval = timedelta(seconds=10)  # 30-second interval
+    idle_interval = timedelta(seconds=5)  # 30-second interval
     return datetime.now() - st.session_state.last_trigger_time > idle_interval
 
 # --- Main Logic ---
@@ -219,8 +219,5 @@ if should_run_idle():
     process_image()
 
 # --- Periodic Refresh ---
-import time
-
-# Periodic refresh to check for idle condition
-time.sleep(1)  # Wait for 1 second before re-rendering
-st.experimental_rerun()  # Force the app to refresh
+time.sleep(1)  # Wait for 1 second before rerunning the script
+st.rerun()  # Immediately rerun the script
