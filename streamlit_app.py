@@ -42,23 +42,6 @@ st.markdown(
         text-align: center; /* Center-align text */
     }}
 
-    /* Center and style the image */
-    .image-container {{
-        display: flex;
-        justify-content: center; /* Center horizontally */
-        align-items: center;    /* Center vertically (if necessary) */
-    }}
-
-
-    /* Apply a rule to all images */
-    img {{
-        max-height: 80vh;  /* Fit image to 90% of viewport height */
-        height: auto;      /* Maintain aspect ratio by scaling height */
-        width: auto;       /* Maintain aspect ratio */
-        display: block;    /* Center horizontally */
-        margin: 0 auto;    /* Center the image */
-    }}
-
     footer {{display: none;}}
     header {{display: none;}}
     </style>
@@ -280,21 +263,7 @@ def process_image():
                                         
 
                     # st.image(draw_image, caption=f"Made with Flickr image {photo_id}", use_container_width=True)
-                    #st.image(draw_image, use_container_width=False)
-
-
-                    # Save the image to a temporary file
-                    draw_image.save("temp_image.png")  # Save the image temporarily
-
-                    # Display the image with a custom container for proper centering
-                    st.markdown(
-                        """
-                        <div class="image-container">
-                            <img src="temp_image.png" alt="Image" />
-                        </div>
-                        """,
-                        unsafe_allow_html=True
-                    )
+                    st.image(draw_image, use_container_width=True)
 
                     # Example usage
                     # display_image_with_custom_height(
