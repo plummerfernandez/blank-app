@@ -9,8 +9,10 @@ import numpy as np
 import random
 import os
 import base64
+import re
 from ultralytics import YOLO
 from datetime import datetime, timedelta
+
 
 
 # Load YOLOv8 pretrained model
@@ -121,8 +123,19 @@ def extract_random_word(title):
     """
     words = title.split()  # Split the title into words
     if words:
-        return random.choice(words).upper()  # Randomly pick a word and capitalize it
+        title= random.choice(words).upper()  # Randomly pick a word and capitalize it
+        cleaned_title = remove_numbers_from_title(title)
+        return cleaned_title
     return "WRONG"  # Fallback if no words are found
+
+def remove_numbers_from_title(title):
+    """
+    Remove all numbers from the given title string.
+    
+    :param title: The title string to process.
+    :return: The title with numbers removed.
+    """
+    return re.sub(r'\d+', '', title).strip()
 
 def display_image_with_custom_height(image, max_height="90vh"):
     """
