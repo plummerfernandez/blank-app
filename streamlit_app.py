@@ -229,5 +229,5 @@ if should_run_idle():
     process_image()
 
 # --- Periodic Refresh ---
-time.sleep(1)  # Wait for 1 second before rerunning the script
+time.sleep(10)  # Wait for 1 second before rerunning the script
 st.rerun()  # Immediately rerun the script
