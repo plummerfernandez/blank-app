@@ -272,7 +272,7 @@ def process_image():
                                         
 
                     # st.image(draw_image, caption=f"Made with Flickr image {photo_id}", use_container_width=True)
-                    st.image(draw_image, use_container_width=True)
+                    st.image(draw_image, use_container_width=False)
 
                     # Example usage
                     # display_image_with_custom_height(
